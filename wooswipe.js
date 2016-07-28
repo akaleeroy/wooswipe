@@ -34,8 +34,8 @@
     var mainImage = $('.single-product-main-image img');
     if(!mainImage.length){
       mainImage = $('#wooswipe > img');
-      mainImage.wrap( '<a class="woocommerce-main-image zoom" href="#"></a>' )
-      $('.woocommerce-main-image').wrap('<div class="single-product-main-image"></div>')
+      mainImage.wrap( '<a class="woocommerce-main-image zoom" href="#"></a>' );
+      $('.woocommerce-main-image').wrap('<div class="single-product-main-image"></div>');
     }
     $('.thumbnails .thumb').click(function(e) {
       e.preventDefault();
@@ -58,6 +58,8 @@
         .attr('data-hq', hq)
         .attr('data-w', hqw)
         .attr('data-h', hqh);
+        // Update current image link
+        mainImage.parent().attr('href', mainImage.attr('data-hq'));
     });
   })();
 
