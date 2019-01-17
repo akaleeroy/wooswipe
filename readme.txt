@@ -1,20 +1,20 @@
 === WooSwipe WooCommerce Gallery ===
 Contributors: deanoakley, jinksi
-Author: Dean Oakley
-Author URI: http://thriveweb.com.au/
-Plugin URI: http://thriveweb.com.au/the-lab/wooswipe/
+Author: Web Design Gold Coast
+Author URI: https://thriveweb.com.au/
+Plugin URI: https://thriveweb.com.au/the-lab/wooswipe/
 Tags: WooSwipe, woocommerce, woocommerce gallery, products, product gallery, responsive
 Requires at least: 3.0
-Tested up to: 4.5.3
-Stable tag: 1.1.6
+Tested up to: 5.0.1
+Stable tag: 1.1.6.8
 
 A WooCommerce gallery plugin built using PhotoSwipe from Dmitry Semenov and Slick carousel.
 
 == Description ==
 
-A WooCommerce gallery plugin built using PhotoSwipe from Dmitry Semenov. [photoswipe](http://photoswipe.com/ "PhotoSwipe") and [slick carousel](http://kenwheeler.github.io/slick/ "Slick Carousel") Slick Carousel.
+A WooCommerce gallery plugin built using PhotoSwipe from Dmitry Semenov. [photoswipe](http://photoswipe.com/ "PhotoSwipe") and [slick carousel](http://kenwheeler.github.io/slick/ "Slick Carousel").
 
-WooSwipe should work out of the box with your WooCommerce gallery settings. Simply adjust your image sizes in WooCommerce > Settings > Products > Display. You may need to rebuild your thumbnails.
+WooSwipe should work out of the box with your WooCommerce gallery settings. Simply adjust your image sizes in WooCommerce > Settings > Products > Display. You may need to rebuild your thumbnails when changing image sizes.
 
 * Responsive
 * Very Mobile Friendly
@@ -31,6 +31,11 @@ wooswipe_after_main
 
 Filter:
 wooswipe_zoomed_image_size
+add_filter( 'wooswipe_zoomed_image_size', 'max_image_size', 10, 1 );
+function max_image_size( $size ) {
+	$size = "large";
+	return $size;
+}
 
 Join the chat at https://gitter.im/thriveweb/wooswipe
 
@@ -46,6 +51,27 @@ Join the chat at https://gitter.im/thriveweb/wooswipe
 
 1. Screenshot Default gallery layout
 2. Screenshot Popup layout
+
+= 1.1.6.8 =
+* Meta update and testing with WP v5
+* Merged pull request from @matthijs166 https://github.com/thriveweb/wooswipe/pull/28
+
+= 1.1.6.7 =
+* Added alt tag to main image
+
+= 1.1.6.6 =
+* Readme
+* z-index increase
+
+= 1.1.6.5 =
+* Fixed image change bug with variation selector
+* Removed file
+
+= 1.1.6.3 =
+* Fixed depreciation notice of get_gallery_attachment_ids
+
+= 1.1.6.2 =
+* Readme docs update
 
 = 1.1.6 =
 * Fix Undefined variable: zoomed_image_size

@@ -2,15 +2,15 @@
 /*
 Plugin Name: WooSwipe
 Plugin URI: http://thriveweb.com.au/the-lab/wooswipe/
-Description: This is a image gallery plugin for WordPress built using wooswipe from Dmitry Semenov <a href="http://photoswipe.com.au/">photoswipe</a> and <a href="http://kenwheeler.github.io/slick/">Slick</a> Carousel</a>.
+Description: This is a image gallery plugin for WordPress built using <a href="http://photoswipe.com.au/">photoswipe</a> from Dmitry Semenov and <a href="http://kenwheeler.github.io/slick/">Slick</a> Carousel</a>.
 
-Author: Dean Oakley, Eric Jinks, BJ CJ
-Author URI: http://thriveweb.com.au/
-Version: 1.1.6
+Author: Thrive Website Design
+Author URI: https://thriveweb.com.au/
+Version: 1.1.6.8
 Text Domain: wooswipe
 */
 
-/*  Copyright 2010  Dean Oakley  (email : dean@thriveweb.com.au)
+/*  Copyright 2018  Dean Oakley  (email : dean@thriveweb.com.au)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as
@@ -45,10 +45,7 @@ class wooswipe_plugin_options {
 
 			update_option('wooswipe_options', $options);
 		}
-
 		return $options;
-
-
 	}
 
 
@@ -154,20 +151,22 @@ function wooswipe_scripts_method() {
 	$wooswipe_wp_plugin_path =  plugins_url() . '/wooswipe' ;
 	$options = get_option('wooswipe_options');
 
-	wp_enqueue_style( 'pswp-css', $wooswipe_wp_plugin_path . '/pswp/photoswipe.css'  );
+	if ( is_woocommerce() && is_product() ) {
+		wp_enqueue_style( 'pswp-css', $wooswipe_wp_plugin_path . '/pswp/photoswipe.css'  );
 
-    if($options['white_theme']) wp_enqueue_style( 'white_theme', $wooswipe_wp_plugin_path . '/pswp/white-skin/skin.css'  );
-    else wp_enqueue_style( 'pswp-skin', $wooswipe_wp_plugin_path . '/pswp/default-skin/default-skin.css'  );
-    wp_enqueue_style( 'slick-css', $wooswipe_wp_plugin_path . '/slick/slick.css'  );
-    wp_enqueue_style( 'slick-theme', $wooswipe_wp_plugin_path . '/slick/slick-theme.css'  );
+	    if($options['white_theme']) wp_enqueue_style( 'white_theme', $wooswipe_wp_plugin_path . '/pswp/white-skin/skin.css'  );
+	    else wp_enqueue_style( 'pswp-skin', $wooswipe_wp_plugin_path . '/pswp/default-skin/default-skin.css'  );
+	    wp_enqueue_style( 'slick-css', $wooswipe_wp_plugin_path . '/slick/slick.css'  );
+	    wp_enqueue_style( 'slick-theme', $wooswipe_wp_plugin_path . '/slick/slick-theme.css'  );
 
-    wp_enqueue_script( 'pswp', $wooswipe_wp_plugin_path . '/pswp/photoswipe.min.js', null, null, true );
-    wp_enqueue_script( 'pswp-ui', $wooswipe_wp_plugin_path . '/pswp/photoswipe-ui-default.min.js', null, null, true );
+	    wp_enqueue_script( 'pswp', $wooswipe_wp_plugin_path . '/pswp/photoswipe.min.js', null, null, true );
+	    wp_enqueue_script( 'pswp-ui', $wooswipe_wp_plugin_path . '/pswp/photoswipe-ui-default.min.js', null, null, true );
 
 		wp_enqueue_script( 'slick', $wooswipe_wp_plugin_path .'/slick/slick.min.js', null, null, true );
 
 		wp_enqueue_style( 'wooswipe-css', $wooswipe_wp_plugin_path . '/wooswipe.css' );
-    wp_enqueue_script( 'wooswipe-js', $wooswipe_wp_plugin_path .'/wooswipe.js', null, null, true );
+	    wp_enqueue_script( 'wooswipe-js', $wooswipe_wp_plugin_path .'/wooswipe.js', null, null, true );
+	}
 }
 add_action('wp_enqueue_scripts', 'wooswipe_scripts_method');
 
@@ -211,24 +210,34 @@ function wooswipe_woocommerce_show_product_thumbnails(){
 					)
 			);
 
-			$attachment_count = count( $product->get_gallery_attachment_ids() );
+			if (method_exists($product, 'get_gallery_image_ids')) {
+				$attachment_count = count( $product->get_gallery_image_ids() );
+			} else {
+				$attachment_count = count( $product->get_gallery_attachment_ids() );
+			}
 
 			$gallery = $attachment_count > 0 ? '[product-gallery]' : '';
 
 			echo apply_filters( 'woocommerce_single_product_image_html', sprintf( '
-				<div class="single-product-main-image">
-					<a href="%s"  class="woocommerce-main-image zoom" title="%s" >%s</a>
+				<div class="woocommerce-product-gallery__image single-product-main-image">
+					<a href="%s" alt="%s" class="woocommerce-main-image zoom" >%s</a>
 				</div>',
 				$image_link, $image_title, $image ), $post->ID );
 		} else {
 			echo apply_filters( 'woocommerce_single_product_image_html', sprintf( '<img src="%s" alt="%s" />', wc_placeholder_img_src(), __( 'Placeholder', 'woocommerce' ) ), $post->ID );
 		}
 
-		$attachment_ids = $product->get_gallery_attachment_ids();
+		if (method_exists($product, 'get_gallery_image_ids')) {
+			$attachment_ids = $product->get_gallery_image_ids();
+		} else {
+			$attachment_ids = $product->get_gallery_attachment_ids();
+		}
+
 		if ( $attachment_ids ) { ?>
 			<div class="thumbnails">
 					<ul class="thumbnail-nav">
 						<?php
+						if(!function_exists('addImageThumbnail')){
 							function addImageThumbnail($attachment_id, $zoomed_image_size){
 								global $post;
 								$image       	= wp_get_attachment_image( $attachment_id, 'shop_thumbnail' );
@@ -241,6 +250,7 @@ function wooswipe_woocommerce_show_product_thumbnails(){
 									</li>',
 									$hq[0], $hq[1], $hq[2], $med[0], $med[1], $med[2], $image ), $attachment_id, $post->ID );
 							}
+						}
 
 							/// add main image
 							if ( has_post_thumbnail() ) {
@@ -257,6 +267,7 @@ function wooswipe_woocommerce_show_product_thumbnails(){
 					</ul>
 
 			</div>
+			<?php do_action( 'wooswipe_after_thumbs' ); ?>
 		<?php }
 		// Hook After Wooswipe
 		do_action( 'wooswipe_after_main' );?>
@@ -300,4 +311,15 @@ function wooswipe_woocommerce_show_product_thumbnails(){
 	    </div>
 	</div>
 
-<?php } ?>
+<?php
+}
+
+add_action( 'after_setup_theme', 'wooswipe_theme_setup' );
+
+function wooswipe_theme_setup() {
+	add_theme_support( 'wc-product-gallery-zoom' );
+	add_theme_support( 'wc-product-gallery-lightbox' );
+	add_theme_support( 'wc-product-gallery-slider' );
+}
+
+?>
